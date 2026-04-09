@@ -10,6 +10,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import type { LiteratureResult } from "@shared/schema";
 
@@ -193,45 +200,54 @@ export default function Home() {
             <div className="grid grid-cols-3 gap-3 text-sm">
               <div className="flex flex-col gap-1">
                 <label className="text-muted-foreground text-xs">最低 IF</label>
-                <Input
-                  data-testid="input-min-if"
-                  type="number"
-                  min={0}
-                  step={0.5}
-                  value={minIF}
-                  onChange={(e) => setMinIF(Number(e.target.value))}
-                  className="h-9"
+                <Select
+                  value={String(minIF)}
+                  onValueChange={(v) => setMinIF(Number(v))}
                   disabled={loading}
-                />
+                >
+                  <SelectTrigger data-testid="input-min-if" className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[1, 2, 3, 4, 5, 6, 8, 10, 15, 20].map((v) => (
+                      <SelectItem key={v} value={String(v)}>{v}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-muted-foreground text-xs">年份範圍</label>
-                <div className="flex items-center gap-1">
-                  <Input
-                    data-testid="input-years"
-                    type="number"
-                    min={1}
-                    max={20}
-                    value={yearsBack}
-                    onChange={(e) => setYearsBack(Number(e.target.value))}
-                    className="h-9"
-                    disabled={loading}
-                  />
-                  <span className="text-muted-foreground text-xs shrink-0">年內</span>
-                </div>
+                <Select
+                  value={String(yearsBack)}
+                  onValueChange={(v) => setYearsBack(Number(v))}
+                  disabled={loading}
+                >
+                  <SelectTrigger data-testid="input-years" className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[1, 2, 3, 5, 7, 10, 15, 20].map((v) => (
+                      <SelectItem key={v} value={String(v)}>{v} 年內</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-muted-foreground text-xs">最大筆數</label>
-                <Input
-                  data-testid="input-max-results"
-                  type="number"
-                  min={1}
-                  max={500}
-                  value={maxResults}
-                  onChange={(e) => setMaxResults(Math.min(500, Number(e.target.value)))}
-                  className="h-9"
+                <Select
+                  value={String(maxResults)}
+                  onValueChange={(v) => setMaxResults(Number(v))}
                   disabled={loading}
-                />
+                >
+                  <SelectTrigger data-testid="input-max-results" className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[50, 100, 200, 300, 500].map((v) => (
+                      <SelectItem key={v} value={String(v)}>{v} 筆</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
