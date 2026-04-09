@@ -168,10 +168,10 @@ export default function Home() {
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Main search input */}
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Input
                 data-testid="input-query"
-                placeholder="輸入搜尋主題，例如：Osteoporosis, Lupus, Cancer immunotherapy..."
+                placeholder="輸入搜尋主題，例如：Osteoporosis, Lupus..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -182,7 +182,7 @@ export default function Home() {
                 data-testid="button-search"
                 onClick={handleSearch}
                 disabled={loading || !query.trim()}
-                className="min-w-[100px]"
+                className="w-full sm:w-auto sm:min-w-[100px]"
               >
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4 mr-1" />}
                 {loading ? "搜尋中" : "搜尋"}
@@ -190,9 +190,9 @@ export default function Home() {
             </div>
 
             {/* Filter row */}
-            <div className="flex flex-wrap items-center gap-4 text-sm">
-              <div className="flex items-center gap-2">
-                <label className="text-muted-foreground whitespace-nowrap">最低 IF:</label>
+            <div className="grid grid-cols-3 gap-3 text-sm">
+              <div className="flex flex-col gap-1">
+                <label className="text-muted-foreground text-xs">最低 IF</label>
                 <Input
                   data-testid="input-min-if"
                   type="number"
@@ -200,26 +200,28 @@ export default function Home() {
                   step={0.5}
                   value={minIF}
                   onChange={(e) => setMinIF(Number(e.target.value))}
-                  className="w-20 h-8"
+                  className="h-9"
                   disabled={loading}
                 />
               </div>
-              <div className="flex items-center gap-2">
-                <label className="text-muted-foreground whitespace-nowrap">年份範圍:</label>
-                <Input
-                  data-testid="input-years"
-                  type="number"
-                  min={1}
-                  max={20}
-                  value={yearsBack}
-                  onChange={(e) => setYearsBack(Number(e.target.value))}
-                  className="w-20 h-8"
-                  disabled={loading}
-                />
-                <span className="text-muted-foreground">年內</span>
+              <div className="flex flex-col gap-1">
+                <label className="text-muted-foreground text-xs">年份範圍</label>
+                <div className="flex items-center gap-1">
+                  <Input
+                    data-testid="input-years"
+                    type="number"
+                    min={1}
+                    max={20}
+                    value={yearsBack}
+                    onChange={(e) => setYearsBack(Number(e.target.value))}
+                    className="h-9"
+                    disabled={loading}
+                  />
+                  <span className="text-muted-foreground text-xs shrink-0">年內</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <label className="text-muted-foreground whitespace-nowrap">最大筆數:</label>
+              <div className="flex flex-col gap-1">
+                <label className="text-muted-foreground text-xs">最大筆數</label>
                 <Input
                   data-testid="input-max-results"
                   type="number"
@@ -227,7 +229,7 @@ export default function Home() {
                   max={500}
                   value={maxResults}
                   onChange={(e) => setMaxResults(Math.min(500, Number(e.target.value)))}
-                  className="w-20 h-8"
+                  className="h-9"
                   disabled={loading}
                 />
               </div>
@@ -247,12 +249,12 @@ export default function Home() {
         {searchDone && (
           <div className="space-y-4">
             {/* Stats bar */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <span>共掃描 <strong className="text-foreground">{totalScanned}</strong> 篇</span>
-                <span>·</span>
-                <span>符合條件 <strong className="text-foreground">{results.length}</strong> 篇</span>
-                <span>·</span>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+                <span>掃描 <strong className="text-foreground">{totalScanned}</strong> 篇</span>
+                <span className="hidden sm:inline">·</span>
+                <span>符合 <strong className="text-foreground">{results.length}</strong> 篇</span>
+                <span className="hidden sm:inline">·</span>
                 <span>IF ≥ {minIF}</span>
               </div>
               {results.length > 0 && (
@@ -309,67 +311,105 @@ export default function Home() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="border border-border rounded-lg overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm" data-testid="table-results">
-                    <thead>
-                      <tr className="bg-muted/50 border-b border-border">
-                        <th className="text-left px-3 py-2 font-medium w-8">#</th>
-                        <th className="text-left px-3 py-2 font-medium min-w-[250px]">標題</th>
-                        <th className="text-left px-3 py-2 font-medium min-w-[150px]">作者</th>
-                        <th className="text-left px-3 py-2 font-medium min-w-[120px]">期刊</th>
-                        <th className="text-center px-3 py-2 font-medium w-16">IF</th>
-                        <th className="text-center px-3 py-2 font-medium w-20">日期</th>
-                        <th className="text-center px-3 py-2 font-medium w-16">連結</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {results.map((r, i) => (
-                        <tr
-                          key={i}
-                          className="border-b border-border/50 hover:bg-muted/30 transition-colors"
-                          data-testid={`row-result-${i}`}
-                        >
-                          <td className="px-3 py-2 text-muted-foreground">{i + 1}</td>
-                          <td className="px-3 py-2">
-                            <div className="font-medium leading-snug line-clamp-2">{r.title}</div>
-                            {r.abstract && (
-                              <div className="text-xs text-muted-foreground mt-1 line-clamp-1">{r.abstract}</div>
-                            )}
-                          </td>
-                          <td className="px-3 py-2 text-muted-foreground">
-                            <div className="line-clamp-2 text-xs">{r.author}</div>
-                          </td>
-                          <td className="px-3 py-2">
-                            <div className="text-xs line-clamp-1">{r.journal}</div>
-                          </td>
-                          <td className="px-3 py-2 text-center">
-                            <Badge variant="secondary" className="text-xs font-mono">
-                              {r.impactFactor}
-                            </Badge>
-                          </td>
-                          <td className="px-3 py-2 text-center text-xs text-muted-foreground whitespace-nowrap">
-                            {r.publicationDate?.slice(0, 10)}
-                          </td>
-                          <td className="px-3 py-2 text-center">
-                            {r.pubUrl && (
-                              <a
-                                href={r.pubUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center text-primary hover:underline"
-                                data-testid={`link-pub-${i}`}
-                              >
-                                <ExternalLink className="h-3.5 w-3.5" />
-                              </a>
-                            )}
-                          </td>
+              <>
+                {/* Desktop table */}
+                <div className="hidden md:block border border-border rounded-lg overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm" data-testid="table-results">
+                      <thead>
+                        <tr className="bg-muted/50 border-b border-border">
+                          <th className="text-left px-3 py-2 font-medium w-8">#</th>
+                          <th className="text-left px-3 py-2 font-medium min-w-[250px]">標題</th>
+                          <th className="text-left px-3 py-2 font-medium min-w-[150px]">作者</th>
+                          <th className="text-left px-3 py-2 font-medium min-w-[120px]">期刊</th>
+                          <th className="text-center px-3 py-2 font-medium w-16">IF</th>
+                          <th className="text-center px-3 py-2 font-medium w-20">日期</th>
+                          <th className="text-center px-3 py-2 font-medium w-16">連結</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {results.map((r, i) => (
+                          <tr
+                            key={i}
+                            className="border-b border-border/50 hover:bg-muted/30 transition-colors"
+                            data-testid={`row-result-${i}`}
+                          >
+                            <td className="px-3 py-2 text-muted-foreground">{i + 1}</td>
+                            <td className="px-3 py-2">
+                              <div className="font-medium leading-snug line-clamp-2">{r.title}</div>
+                              {r.abstract && (
+                                <div className="text-xs text-muted-foreground mt-1 line-clamp-1">{r.abstract}</div>
+                              )}
+                            </td>
+                            <td className="px-3 py-2 text-muted-foreground">
+                              <div className="line-clamp-2 text-xs">{r.author}</div>
+                            </td>
+                            <td className="px-3 py-2">
+                              <div className="text-xs line-clamp-1">{r.journal}</div>
+                            </td>
+                            <td className="px-3 py-2 text-center">
+                              <Badge variant="secondary" className="text-xs font-mono">
+                                {r.impactFactor}
+                              </Badge>
+                            </td>
+                            <td className="px-3 py-2 text-center text-xs text-muted-foreground whitespace-nowrap">
+                              {r.publicationDate?.slice(0, 10)}
+                            </td>
+                            <td className="px-3 py-2 text-center">
+                              {r.pubUrl && (
+                                <a
+                                  href={r.pubUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center text-primary hover:underline"
+                                  data-testid={`link-pub-${i}`}
+                                >
+                                  <ExternalLink className="h-3.5 w-3.5" />
+                                </a>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </div>
+
+                {/* Mobile card list */}
+                <div className="md:hidden space-y-3" data-testid="mobile-results">
+                  {results.map((r, i) => (
+                    <Card key={i} className="overflow-hidden" data-testid={`card-result-${i}`}>
+                      <CardContent className="p-3 space-y-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="text-xs text-muted-foreground mb-0.5">#{i + 1}</div>
+                            <div className="font-medium text-sm leading-snug line-clamp-3">{r.title}</div>
+                          </div>
+                          {r.pubUrl && (
+                            <a
+                              href={r.pubUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="shrink-0 p-2 text-primary hover:bg-muted rounded-md"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </a>
+                          )}
+                        </div>
+                        <div className="text-xs text-muted-foreground line-clamp-1">{r.author}</div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Badge variant="secondary" className="text-xs font-mono">IF {r.impactFactor}</Badge>
+                          <span className="text-xs text-muted-foreground">{r.journal}</span>
+                          <span className="text-xs text-muted-foreground">{r.publicationDate?.slice(0, 10)}</span>
+                        </div>
+                        {r.abstract && (
+                          <div className="text-xs text-muted-foreground line-clamp-2 pt-1 border-t border-border/50">{r.abstract}</div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         )}

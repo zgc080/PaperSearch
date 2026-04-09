@@ -2,7 +2,7 @@
 title: PaperSearch
 emoji: 📚
 colorFrom: blue
-colorTo: teal
+colorTo: green
 sdk: docker
 pinned: false
 license: mit
